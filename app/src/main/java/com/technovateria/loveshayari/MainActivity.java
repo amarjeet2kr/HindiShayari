@@ -84,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Check internet and Wi-Fi connectivity
+        if (!isConnectedToInternet() || !isConnectedToWifi()) {
+            showEnableInternetDialog();
+        }
 
         // Banner ads section of code
         adContainerView = findViewById(R.id.ad_view_container);
@@ -92,11 +96,6 @@ public class MainActivity extends AppCompatActivity {
         adView.setAdUnitId(getString(R.string.adaptive_banner_ad_unit_id_main_activity));
         adView.setAdSize(getAdSize());
         adContainerView.addView(adView);
-
-        // Check internet and Wi-Fi connectivity
-        if (!isConnectedToInternet() || !isConnectedToWifi()) {
-            showEnableInternetDialog();
-        }
 
         adView.setAdListener(new AdListener() {
             @Override
@@ -388,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Handle cancel button click
-                finish();
+                // finish();
             }
         });
         builder.setCancelable(false);
