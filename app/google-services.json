@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "949291872748",
+    "project_id": "hindi-shayari-387ad",
+    "storage_bucket": "hindi-shayari-387ad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:949291872748:android:d8e53f697ec701424c50c9",
+        "android_client_info": {
+          "package_name": "com.technovateria.loveshayari"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "949291872748-snk2b3r82lvf84j99pqhffsp23mha9bo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVQ_D3j-CvuzINqVC5l4E6E7P2lrANTGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "949291872748-snk2b3r82lvf84j99pqhffsp23mha9bo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
