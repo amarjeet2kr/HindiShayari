@@ -50,7 +50,6 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.firebase.BuildConfig;
 import com.technovateria.loveshayari.Adapter.ShayariCategoryAdapter;
 import com.technovateria.loveshayari.Model.ShayariCategoryModel;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -63,6 +62,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.grpc.android.BuildConfig;
 
 public class MainActivity extends AppCompatActivity {
     RecyclerView shayariCategory_recyclerView;
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Check internet and Wi-Fi connectivity
-        if (!isConnectedToInternet() || !isConnectedToWifi()) {
+        if (!isConnectedToInternet() && !isConnectedToWifi()) {
             showEnableInternetDialog();
         }
 
@@ -170,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                                     "बेहतरीन तस्वीरों के साथ जुड़ी हमारी एप,💕\n" +
                                     "अभी इंस्टॉल करें और दोस्तों के साथ शेयर कीजिए।🌹\n" +
                                     "👇👇👇👇👇👇👇👇👇👇👇👇\n\n";
-                            shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID + "\n\n";
+                            shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=com.technovateria.loveshayari\n\n";
                             shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
                             startActivity(Intent.createChooser(shareIntent, "choose one"));
                         } catch (Exception e) {
@@ -225,8 +226,6 @@ public class MainActivity extends AppCompatActivity {
                 showAllShayariCategory();
             }
         });
-
-        //create directory for app
 
     }
 
@@ -395,14 +394,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void grantAppPermission(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED)
         {
 
         } else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{
-                            Manifest.permission.POST_NOTIFICATIONS,
-                            Manifest.permission.READ_MEDIA_IMAGES,
+                            Manifest.permission.READ_MEDIA_IMAGES
                     },
                     REQUEST_CODE
             );

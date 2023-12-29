@@ -64,7 +64,7 @@ public class AllShayariActivity extends AppCompatActivity {
         setContentView(R.layout.activity_all_shayari);
 
         // Check internet and Wi-Fi connectivity
-        if (!isConnectedToInternet() || !isConnectedToWifi()) {
+        if (!isConnectedToInternet() && !isConnectedToWifi()) {
             showEnableInternetDialog();
         }
 
@@ -79,13 +79,13 @@ public class AllShayariActivity extends AppCompatActivity {
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-                Log.d("Banner", "Loading banner ads is failed");
+                Log.d("Banner", "Banner ads is loaded");
                 adContainerView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                Log.d("Banner", "Banner ads is loaded");
+                Log.d("Banner", "Loading banner ads is failed");
                 adContainerView.setVisibility(View.GONE);
             }
         });
