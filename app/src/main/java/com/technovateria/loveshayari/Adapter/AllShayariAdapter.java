@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdRequest;
@@ -38,6 +39,7 @@ import com.technovateria.loveshayari.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +58,8 @@ public class AllShayariAdapter extends RecyclerView.Adapter<AllShayariAdapter.Sh
     Random random = new Random();
     public int CLICK_COUNT = 0;
     public InterstitialAd mInterstitialAd;
+
+    public int SHARE_REQUEST_CODE = 101;
 
     public AllShayariAdapter(AllShayariActivity allShayariActivity, List<AllShayariModel> list) {
         this.allShayariActivity = allShayariActivity;
@@ -187,6 +191,7 @@ public class AllShayariAdapter extends RecyclerView.Adapter<AllShayariAdapter.Sh
         public View downloadImage;
         public View refreshImage;
         public View share;
+        public int SHARE_REQUEST_CODE = 101;
 
         public ShayariViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -229,58 +234,90 @@ public class AllShayariAdapter extends RecyclerView.Adapter<AllShayariAdapter.Sh
     }
     private void shareImage(View v, AllShayariAdapter.ShayariViewHolder holder) {
 
-        //convert any layout as image
+//        //convert any layout as image
+//        holder.shayariBackgroundImg.setDrawingCacheEnabled(true);
+//        holder.shayariBackgroundImg.buildDrawingCache();
+//        holder.shayariBackgroundImg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+//
+//        //create bitmap image
+//        Bitmap bitmap = holder.shayariBackgroundImg.getDrawingCache();
+//
+//        //save in external storage of app cache folder
+//        File directory = new File(v.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString());
+//
+//        System.out.println(v.getContext().getFilesDir());
+//        if (!directory.exists()) {
+//            boolean created = directory.mkdirs();
+//            if (!created) {
+//                Log.e("Drectory Creation", "Failed to create directory");
+//            }
+//        }
+//
+//        String fname = String.format("%d.jpg", System.currentTimeMillis());
+//        File file = new File("/storage/emulated/0/Android/data/com.technovateria.loveshayari/files/Download", fname);
+//        Log.i("TAG", "" + file);
+//
+//        if (file.exists())
+//            file.delete();
+//
+//        try {
+//            FileOutputStream fileOutputStream = new FileOutputStream(file);
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+//            Toast.makeText(v.getContext(), "Wait..", Toast.LENGTH_SHORT).show();
+//
+//            holder.shayariBackgroundImg.setDrawingCacheEnabled(false);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            Toast.makeText(v.getContext(), "Error in Saving", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        Uri fileUri = Uri.parse("/storage/emulated/0/Android/data/com.technovateria.loveshayari/files/Download/" + fname);
+//
+//        // Create the share intent and set the type and data
+//        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+//        shareIntent.setType("image/jpeg");
+//        shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+//        // Add flags to grant temporary permission to external apps to read the content URI
+//        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//        // Start the share activity
+//        v.getContext().startActivity(Intent.createChooser(shareIntent, "Share image via"));
+
         holder.shayariBackgroundImg.setDrawingCacheEnabled(true);
         holder.shayariBackgroundImg.buildDrawingCache();
         holder.shayariBackgroundImg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-
-        //create bitmap image
         Bitmap bitmap = holder.shayariBackgroundImg.getDrawingCache();
+        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG" + timeStamp + ".jpg";
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Hindi Shayari");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Hindi Shayari Image");
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, imageFileName);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000);
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        ContentResolver contentResolver = this.allShayariActivity.getContentResolver();
+        Uri imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-        //save in external storage of app cache folder
-        File directory = new File(v.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString());
-
-        System.out.println(v.getContext().getFilesDir());
-        if (!directory.exists()) {
-            boolean created = directory.mkdirs();
-            if (!created) {
-                Log.e("Drectory Creation", "Failed to create directory");
+        if (imageUri != null) {
+            try {
+                OutputStream outputStream = contentResolver.openOutputStream(imageUri);
+                if (outputStream != null) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    outputStream.close();
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("image/jpeg");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                    v.getContext().startActivity(Intent.createChooser(shareIntent, "Share Image via"));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this.allShayariActivity.getApplicationContext(), "Failed to save image", Toast.LENGTH_SHORT).show();
             }
         }
 
-        String fname = String.format("%d.jpg", System.currentTimeMillis());
-        File file = new File("/storage/emulated/0/Android/data/com.technovateria.loveshayari/files/Download", fname);
-        Log.i("TAG", "" + file);
-
-        if (file.exists())
-            file.delete();
-
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            Toast.makeText(v.getContext(), "Wait..", Toast.LENGTH_SHORT).show();
-
-            holder.shayariBackgroundImg.setDrawingCacheEnabled(false);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(v.getContext(), "Error in Saving", Toast.LENGTH_SHORT).show();
-        }
-
-        Uri fileUri = Uri.parse("/storage/emulated/0/Android/data/com.technovateria.loveshayari/files/Download/" + fname);
-
-        // Create the share intent and set the type and data
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("image/*");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-
-        // Add flags to grant temporary permission to external apps to read the content URI
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        // Start the share activity
-        v.getContext().startActivity(Intent.createChooser(shareIntent, "Share image via"));
     }
 
     private void saveImage(View v, AllShayariAdapter.ShayariViewHolder holder) {
@@ -342,8 +379,8 @@ public class AllShayariAdapter extends RecyclerView.Adapter<AllShayariAdapter.Sh
         holder.shayariBackgroundImg.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         Bitmap bitmap = holder.shayariBackgroundImg.getDrawingCache();
 
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + ".jpg";
+        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG" + timeStamp + ".jpg";
 
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, "Hindi Shayari");
@@ -368,8 +405,6 @@ public class AllShayariAdapter extends RecyclerView.Adapter<AllShayariAdapter.Sh
                 Toast.makeText(this.allShayariActivity.getApplicationContext(), "Failed to save image", Toast.LENGTH_SHORT).show();
             }
         }
-
-
     }
 
     private void loadInterstitialAd(View v){
