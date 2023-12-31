@@ -101,13 +101,13 @@ public class MainActivity extends AppCompatActivity {
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-                Log.d("Banner", "Banner ads is loaded");
+                Log.d("Banner", "Dashboard Banner ads is loaded");
                 adContainerView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                Log.d("Banner", "Loading banner ads is failed");
+                Log.d("Banner", "Loading dashboard banner ads is failed");
                 adContainerView.setVisibility(View.GONE);
             }
         });
